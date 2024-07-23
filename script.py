@@ -2,19 +2,21 @@ import pandas as pd
 import numpy as np
 path = "C:\\Users\\rindu\\workingspace\\transformation\\machine-readable-business-employment-data-mar-2024-quarter.csv"
 work = pd.read_csv(path, delimiter=",")
-print(work.head()) 
+transform = work
+print(transform.head(20))
+# print(work.head()) 
 del_work = work.drop(['Series_title_4', 'Series_title_5', 'Suppressed'], axis=1)
-print(del_work.head())
+# print(del_work.head())
 
 # we need to convert float to a string 
 del_work['Period'] = del_work['Period'].astype(str) 
 #  you need split column name period
 del_work['Period_year'] = del_work['Period'].str.split('.').str[0]
-print(del_work[['Period', 'Period_year', 'Series_reference', 'Data_value']])
+# print(del_work[['Period', 'Period_year', 'Series_reference', 'Data_value']])
 
 
-del_work1 = del_work.groupby(['Series_reference', 'Period_year'])['Data_value'].max()
-print(del_work1)
+del_work1 = del_work.groupby(['Series_reference', 'Period_year'])['Data_value'].sum()
+# print(del_work1)
 
 mapping_dict = {}
 for i , v in del_work1.items():
@@ -28,8 +30,25 @@ for i , v in del_work1.items():
         mapping_dict[i[0]]['Period'] =  i[1] 
         mapping_dict[i[0]]['Data_value'] = v
         
+        
 # convert dictionary in to data frame
 max_sale_year = pd.DataFrame.from_dict(mapping_dict, orient='index', columns=['Period', 'Data_value'])
 
-print(max_sale_year.describe)
-    
+# print(max_sale_year.describe())
+
+
+
+transform2 = transform[transform['Data_value'].isna()]
+print(transform2)
+ 
+transform2.to_csv('transform2.csv')
+
+transform3 =transform.groupby(['Series_reference'])['Data_value'].sum()
+print(transform3)
+
+
+
+
+transform3.to_csv('transform3.csv')
+
+
